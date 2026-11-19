@@ -1,0 +1,6 @@
+# 换行符规则：为什么 batch 用 -text——text/eol=crlf 只保证检出方向是 CRLF，
+# 入库时仍会归一成 LF，仓库 blob 和 zip 直下就是 LF；-text 关闭双向转换，
+# 磁盘上的 CRLF 原样进 blob，GitHub 网页/zip/裸 clone 拿到的都是 CRLF
+* text=auto
+*.bat -text
+*.cmd -text
