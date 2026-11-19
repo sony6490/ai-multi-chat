@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>AI 多窗口对话</title>
+<style>
+  :root { --bg:#86b9d6; --side:#a9cde4; --card:#fff; --text:#1f2d3a; --dim:#5d7385; --line:#e3e9ef; --acc:#2f6fed; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px "Microsoft YaHei UI","Segoe UI",sans-serif; overflow:hidden; user-select:none; }
+  button,select { font:inherit; color:inherit; cursor:pointer; }
+  #side { position:fixed; left:0; top:0; bottom:0; background:var(--side); padding:12px 10px; overflow:hidden; }
+  #side .row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  #side h1 { font-size:15px; margin:0; }
+  .ibtn { border:0; background:transparent; font-size:16px; padding:2px 6px; border-radius:6px; }
+  .ibtn:hover { background:rgba(255,255,255,.5); }
+  .panel { background:#fff; border-radius:10px; padding:8px; margin-bottom:14px; }
+  .lay { display:flex; gap:4px; flex-wrap:wrap; }
+  .lay button { border:0; background:transparent; border-radius:6px; padding:5px; line-height:0; }
+  .lay button.on { background:#e3e9ef; }
+  .sec { font-size:12px; color:var(--dim); margin:0 2px 6px; }
+  .plat { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; background:rgba(255,255,255,.55); margin-bottom:6px; cursor:pointer; }
+  .plat i { width:9px; height:9px; border-radius:50%; background:var(--c); opacity:.35; }
+  .plat.on { background:#fff; } .plat.on i { opacity:1; }
+  .plat small { margin-left:auto; color:var(--dim); font-size:11px; }
+  .zoom { display:flex; align-items:center; justify-content:space-between; color:var(--dim); }
+  select { border:1px solid var(--line); border-radius:6px; padding:3px 6px; background:#fff; }
+  .card { position:fixed; background:var(--card); border-radius:10px; overflow:hidden; }
+  .card.empty { background:rgba(255,255,255,.35); border:2px dashed rgba(255,255,255,.8); display:flex; align-items:center; justify-content:center; color:#fff; }
+  .hd { height:34px; display:flex; align-items:center; gap:6px; padding:0 8px 0 12px; border-bottom:1px solid var(--line); }
+  .hd i { width:9px; height:9px; border-radius:50%; background:var(--c); }
+  .hd b { font-size:13px; }
+  .mdl { border:0; background:#f1f5f9; border-radius:6px; padding:3px 8px; color:var(--dim); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mdl:hover { background:#e3e9ef; }
+  .sp { flex:1; }
+  .hd .ibtn { font-size:14px; color:var(--dim); }
+  #input { position:fixed; background:var(--card); border-radius:10px; display:flex; flex-direction:column; padding:8px 12px; }
+  #prompt { flex:1; resize:none; border:0; outline:0; font:14px "Microsoft YaHei UI",sans-serif; color:var(--text); user-select:text; }
+  #bar { display:flex; align-items:center; gap:8px; height:34px; }
+  #bar .txt { border:0; background:#f1f5f9; border-radius:6px; padding:5px 10px; }
+  #bar .txt:hover { background:#e3e9ef; }
+  #status { flex:1; color:var(--dim); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #send { width:34px; height:34px; border-radius:50%; border:0; background:var(--acc); color:#fff; font-size:16px; }
+  #send:disabled { opacity:.5; cursor:default; }
+</style></head>
+<body>
+<div id="side"></div><div id="cards"></div>
+<div id="input">
+  <textarea id="prompt" placeholder="输入提示词，Enter 同步发送给所有已显示的平台，Shift+Enter 换行"></textarea>
+  <div id="bar"><button class="txt" id="plib">提示词库</button><button class="txt" id="newall">全部新对话</button><span id="status"></span><button id="send" title="同步发送">↑</button></div>
+</div>
+<script>
+const $ = id => document.getElementById(id); let S = null, tt;
+const say = (html) => { $('status').innerHTML = html; clearTimeout(tt); tt = setTimeout(() => $('status').textContent = '', 9000); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const icon = ([c, r]) => { const w = 22, h = 16, g = 2, cw = (w - (c - 1) * g) / c, ch = (h - (r - 1) * g) / r; let s = '';
+  for (let i = 0; i < c * r; i++) s += `<rect x="${(i % c) * (cw + g)}" y="${Math.floor(i / c) * (ch + g)}" width="${cw}" height="${ch}" rx="1.5" fill="#5d7385"/>`;
+  return `<svg width="${w}" height="${h}">${s}</svg>`; };
+function render() {
+  const sb = $('side'); sb.style.width = S.SB + 'px';
+  if (!S.sidebar) sb.innerHTML = '<div class="row"><button class="ibtn" data-act="sb">☰</button></div>';
+  else sb.innerHTML = `<div class="row"><h1>AI 多窗口</h1><button class="ibtn" data-act="sb">⟪</button></div>
+    <div class="panel"><div class="sec">布局</div><div class="lay">${S.layouts.map((l, i) => `<button data-act="lay" data-i="${i}" class="${i === S.layout ? 'on' : ''}" title="${l[0] * l[1]} 窗格">${icon(l)}</button>`).join('')}</div></div>
+    <div class="sec">平台（点击开关）</div>
+    ${S.platforms.map(p => { const on = S.selected.includes(p.id), vis = S.visible.includes(p.id);
+      return `<div class="plat ${on ? 'on' : ''}" style="--c:${p.color}" data-act="tg" data-id="${p.id}"><i></i>${esc(p.name)}<small>${on && !vis ? '未显示' : ''}</small></div>`; }).join('')}
+    <div class="panel zoom" style="margin-top:14px">页面缩放<select id="zoom">${[.6,.7,.8,.9,1].map(z => `<option value="${z}" ${z === S.zoom ? 'selected' : ''}>${z * 100}%</option>`).join('')}</select></div>
+    <div class="sec" style="line-height:1.6">Ctrl+Shift+I 在面板内打开开发者工具，用于查找选择器</div>`;
+  const z = $('zoom'); if (z) z.onchange = e => api.setZoom(parseFloat(e.target.value));
+  let html = '';
+  S.cells.forEach((c, i) => {
+    const id = S.visible[i], st = `left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px`;
+    if (!id) { html += `<div class="card empty" style="${st}">空位</div>`; return; }
+    const p = S.platforms.find(x => x.id === id);
+    html += `<div class="card" style="${st}"><div class="hd" style="--c:${p.color}"><i></i><b>${esc(p.name)}</b>
+      <button class="mdl" data-act="mdl" data-id="${id}">${esc(S.models[id] || '默认模型')} ▾</button><span class="sp"></span>
+      <button class="ibtn" title="刷新" data-act="rf" data-id="${id}">↻</button><button class="ibtn" title="新对话" data-act="nc" data-id="${id}">＋</button>
+      <button class="ibtn" title="复制回答" data-act="cp" data-id="${id}">⧉</button><button class="ibtn" title="关闭此窗格" data-act="tg" data-id="${id}">✕</button></div></div>`;
+  });
+  $('cards').innerHTML = html;
+  const n = S.input, el = $('input'); el.style.cssText = `left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return; const id = b.dataset.id;
+  ({ sb: () => api.toggleSidebar(), lay: () => api.setLayout(+b.dataset.i), tg: () => api.toggle(id), mdl: () => api.modelMenu(id),
+     rf: () => api.refresh(id), nc: () => api.newChat(id), cp: () => api.copyAnswer(id) })[b.dataset.act]();
+});
+async function send() {
+  const t = $('prompt').value.trim(); if (!t || !S.visible.length) return;
+  $('send').disabled = true; say('发送中…');
+  const res = await api.send(t);
+  say(res.map(r => r.ok ? `<span style="color:#1a9a62">✓ ${esc(r.name)}</span>` : `<span style="color:#d6453d">✗ ${esc(r.name)}：${esc(r.msg)}</span>`).join('　'));
+  if (res.some(r => r.ok)) $('prompt').value = '';
+  $('send').disabled = false;
+}
+$('send').onclick = send;
+$('newall').onclick = () => api.newChatAll();
+$('plib').onclick = () => api.promptMenu($('prompt').value);
+$('prompt').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); send(); } });
+api.on('state', s => { S = s; render(); });
+api.on('toast', m => say(esc(m)));
+api.on('insert', t => { $('prompt').value = t; $('prompt').focus(); });
+api.ready();
+</script></body></html>

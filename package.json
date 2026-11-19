@@ -1,0 +1,8 @@
+{
+  "name": "ai-multi-chat",
+  "version": "2.2.0",
+  "description": "多 AI 平台分屏 + 一次提示词同步注入",
+  "main": "main.js",
+  "scripts": { "start": "electron ." },
+  "devDependencies": { "electron": "^33.2.0" }
+}
