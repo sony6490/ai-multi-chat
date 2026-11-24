@@ -5,7 +5,7 @@ const fs = require('fs');
 app.userAgentFallback = app.userAgentFallback.replace(/\s(Electron|ai-multi-chat)\/\S+/g, '');
 
 const SB_OPEN = 200, SB_SHUT = 48, PAD = 8, HDR = 34, INPUT = 104;
-const LAYOUTS = [[1, 1], [2, 1], [3, 1], [2, 2], [3, 2], [4, 2]]; // [列, 行]
+const LAYOUTS = [[1, 1], [2, 1], [3, 1], [2, 2], [3, 2], [4, 2], [3, 3]]; // [列, 行]
 const platforms = JSON.parse(fs.readFileSync(path.join(__dirname, 'platforms.json'), 'utf8'));
 const dataFile = n => path.join(app.getPath('userData'), n);
 const readJson = (n, d) => { try { return JSON.parse(fs.readFileSync(dataFile(n), 'utf8')); } catch (e) { return d; } };

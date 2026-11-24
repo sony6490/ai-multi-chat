@@ -1,22 +1,129 @@
 [
-  { "id": "chatgpt", "name": "ChatGPT", "url": "https://chatgpt.com", "color": "#10a37f",
-    "input": ["#prompt-textarea"], "send": ["button[data-testid=\"send-button\"]"],
+  {
+    "id": "chatgpt",
+    "name": "ChatGPT",
+    "url": "https://chatgpt.com",
+    "color": "#10a37f",
+    "input": [
+      "#prompt-textarea"
+    ],
+    "send": [
+      "button[data-testid=\"send-button\"]"
+    ],
     "modelTrigger": "button[data-testid=\"model-switcher-dropdown-button\"]",
-    "answer": ["[data-message-author-role=\"assistant\"]"], "models": [] },
-  { "id": "claude", "name": "Claude", "url": "https://claude.ai", "color": "#d97757",
-    "input": ["div.ProseMirror[contenteditable=\"true\"]"], "send": ["button[aria-label=\"Send message\"]", "button[aria-label=\"发送消息\"]"],
+    "answer": [
+      "[data-message-author-role=\"assistant\"]"
+    ],
+    "models": []
+  },
+  {
+    "id": "claude",
+    "name": "Claude",
+    "url": "https://claude.ai",
+    "color": "#d97757",
+    "input": [
+      "div.ProseMirror[contenteditable=\"true\"]"
+    ],
+    "send": [
+      "button[aria-label=\"Send message\"]",
+      "button[aria-label=\"发送消息\"]"
+    ],
     "modelTrigger": "button[data-testid=\"model-selector-dropdown\"]",
-    "answer": [".font-claude-response", "[data-testid=\"assistant-message\"]"], "models": [] },
-  { "id": "deepseek", "name": "DeepSeek", "url": "https://chat.deepseek.com", "color": "#4d6bfe",
-    "input": ["textarea#chat-input"], "send": [], "modelTrigger": "", "answer": [".ds-markdown"], "models": [] },
-  { "id": "kimi", "name": "Kimi", "url": "https://www.kimi.com", "color": "#16a1ff",
-    "input": ["div[contenteditable=\"true\"]"], "send": [], "modelTrigger": "", "answer": [], "models": [] },
-  { "id": "zhipu", "name": "智谱清言", "url": "https://chatglm.cn", "color": "#3b6cff",
-    "input": ["textarea"], "send": [], "modelTrigger": "", "answer": [], "models": [] },
-  { "id": "qwen", "name": "千问", "url": "https://www.qianwen.com", "color": "#6a4cff",
-    "input": ["textarea"], "send": [], "modelTrigger": "", "answer": [], "models": [] },
-  { "id": "grok", "name": "Grok", "url": "https://grok.com", "color": "#6b7280",
-    "input": ["textarea"], "send": [], "modelTrigger": "", "answer": [], "models": [] },
-  { "id": "doubao", "name": "豆包", "url": "https://www.doubao.com/chat/", "color": "#2e7bff",
-    "input": ["textarea"], "send": [], "modelTrigger": "", "answer": [], "models": [] }
+    "answer": [
+      ".font-claude-response",
+      "[data-testid=\"assistant-message\"]"
+    ],
+    "models": []
+  },
+  {
+    "id": "deepseek",
+    "name": "DeepSeek",
+    "url": "https://chat.deepseek.com",
+    "color": "#4d6bfe",
+    "input": [
+      "textarea#chat-input"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [
+      ".ds-markdown"
+    ],
+    "models": []
+  },
+  {
+    "id": "kimi",
+    "name": "Kimi",
+    "url": "https://www.kimi.com",
+    "color": "#16a1ff",
+    "input": [
+      "div[contenteditable=\"true\"]"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  },
+  {
+    "id": "zhipu",
+    "name": "智谱清言",
+    "url": "https://chatglm.cn",
+    "color": "#3b6cff",
+    "input": [
+      "textarea"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  },
+  {
+    "id": "qwen",
+    "name": "千问",
+    "url": "https://www.qianwen.com",
+    "color": "#6a4cff",
+    "input": [
+      "textarea"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  },
+  {
+    "id": "grok",
+    "name": "Grok",
+    "url": "https://grok.com",
+    "color": "#6b7280",
+    "input": [
+      "textarea"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  },
+  {
+    "id": "doubao",
+    "name": "豆包",
+    "url": "https://www.doubao.com/chat/",
+    "color": "#2e7bff",
+    "input": [
+      "textarea"
+    ],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  },
+  {
+    "id": "yuanbao",
+    "name": "元宝",
+    "url": "https://yuanbao.tencent.com/chat",
+    "color": "#00a870",
+    "input": [],
+    "send": [],
+    "modelTrigger": "",
+    "answer": [],
+    "models": []
+  }
 ]
